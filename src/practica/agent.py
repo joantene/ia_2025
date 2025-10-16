@@ -6,5 +6,5 @@ class Viatger(joc.Viatger):
         super(Viatger, self).__init__(*args, **kwargs)
 
 
-    def actua(self, percepcio: dict):
+    def actua(self, percepcio: dict):        
         return "ESPERAR"

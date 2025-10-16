@@ -1,4 +1,5 @@
-from practica import agent, joc
+from practica import agent_amplada as agent
+from practica import  joc
 
 
 def main():

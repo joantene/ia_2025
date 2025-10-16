@@ -1,4 +1,4 @@
-from aspirador import joc
+from aspirador import joc_gui as joc
 
 
 agents = []
