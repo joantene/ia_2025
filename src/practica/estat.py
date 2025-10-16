@@ -3,26 +3,21 @@ import copy
 class Estat:
 
     #Declaracio de map amb el moviment
-    moviment = {"N": (0,-1),
-                "S": (0,1),
-                "E": (1,0),
-                "O": (-1,0)}
+    MOVIMENT = {"N": (0, -1), "S": (0, 1), "E": (1, 0), "O": (-1, 0)}
+    COSTS = {"MOURE": 1, "BOTAR": 2, "POSAR_PARET": 3}
     
     #Metode constructor
-    def __init__(self, pos_agent, pos_parets, desti, cami = None):
-        if cami is None:
-            cami = []
-            
-        self.pos_agent = pos_agent
-        self.pos_parets = pos_parets
-        self.desti = desti
-        self.cost = 0
-        self.accio = None
-
-        self.cami = cami
+    def __init__(self, pos_agent, pos_parets, desti, cami=None, cost=0):
+        self.pos_agent = tuple(pos_agent)
+        # fem frozenset per fer hashable; si ja és frozenset no passa res
+        self.pos_parets = frozenset(pos_parets)
+        self.desti = tuple(desti)
+        self.cami = [] if cami is None else list(cami)
+        self.cost = cost
         
     @property
     def accions_possibles(self):
+
         accions_possibles = []
         accions_possibles.append((0, "ESPERAR"))
         #MOURE
@@ -39,7 +34,7 @@ class Estat:
 
     #Metode hash
     def __hash__(self):
-        return hash(self.pos_agent, self.pos_parets)
+        return hash((self.pos_agent, self.pos_parets))
     
     #Metode eq
     def __eq__(self, other):
@@ -47,34 +42,88 @@ class Estat:
         
     #Metode transicio 
     """IMPLEMENTAR"""
-    def transicio(self, acc):
-        nou_estat = copy.deepcopy(self)
-        mov, acc = acc
-        pes = 0
-        esLegal = True
-        self.posAntiga = self.pos_agent
-        posObjectiu = self.pos_agent
-        dir = Estat.moviment[mov]
-        if acc == "BOTAR":
-            posObjectiu = (self.pos_agent[0] + 2*dir[0], self.pos_agent[1] + 2*dir[1])
-        if acc == "MOURE" or acc == "POSAR_PARET":
-            posObjectiu = (self.pos_agent[0] + dir[0], self.pos_agent[1] + dir[1])
+    def transicio(self, accio):
 
-        if self.posLegal(posObjectiu) == False:
-            esLegal = False
-        else:
-            if acc == "MOURE" or acc == "BOTAR":
+        """
+        Acció: tuple (tipus, direccio)
+        tipus ∈ {"MOURE","BOTAR","POSAR_PARET","ESPERAR"}
+        direccio ∈ {"N","S","E","O"} o None
 
-                nou_estat.pos_agent = posObjectiu
-                nou_estat.accio = acc
-                pes = nou_estat.CalculaCost()
-                nou_estat.pos_parets.add(self.posAntiga)
-            elif acc == "POSAR_PARET":
-                nou_estat.pos_parets.add(posObjectiu)
-                nou_estat.accio = acc
-                pes = nou_estat.CalculaCost()
+        Retorna (nou_estat, es_legal_bool)
+        """
+        tipus, direccio = accio
+        x, y = self.pos_agent
 
-        return nou_estat,esLegal, pes
+        # Cas especial: esperar
+        if tipus == "ESPERAR":
+            nou = copy.deepcopy(self)
+            nou.cami.append(("ESPERAR", None))
+            # Pots deixar cost 0 si esperar no ha de costar res
+            nou.cost += 0
+            return nou, True
+
+        # Si no hi ha direcció vàlida
+        if direccio not in self.MOVIMENT:
+            return self, False
+
+        dx, dy = self.MOVIMENT[direccio]
+
+        # 🔹 1. MOURE
+        if tipus == "MOURE":
+            nx, ny = x + dx, y + dy
+            if (nx, ny) in self.pos_parets:
+                return self, False  # No pots moure't dins una paret
+
+            noves_parets = set(self.pos_parets)
+            noves_parets.add((x, y))  # Deixa paret darrere
+            nou = Estat(
+                pos_agent=(nx, ny),
+                pos_parets=noves_parets,
+                desti=self.desti,
+                cami=self.cami + [(tipus, direccio)],
+                cost=self.cost + self.COSTS["MOURE"]
+            )
+            return nou, True
+
+        # 🔹 2. BOTAR
+        if tipus == "BOTAR":
+            nx, ny = x + 2 * dx, y + 2 * dy
+            if (nx, ny) in self.pos_parets:
+                return self, False  # No pots caure dins una paret
+
+            noves_parets = set(self.pos_parets)
+            noves_parets.add((x, y))
+            nou = Estat(
+                pos_agent=(nx, ny),
+                pos_parets=noves_parets,
+                desti=self.desti,
+                cami=self.cami + [(tipus, direccio)],
+                cost=self.cost + self.COSTS["BOTAR"]
+            )
+            return nou, True
+
+        # 🔹 3. POSAR_PARET
+        if tipus == "POSAR_PARET":
+            px, py = x + dx, y + dy
+            if (px, py) in self.pos_parets or (px, py) == self.desti:
+                return self, False  # No pots posar paret al destí o damunt d'una paret
+
+            noves_parets = set(self.pos_parets)
+            noves_parets.add((px, py))
+            nou = Estat(
+                pos_agent=(x, y),
+                pos_parets=noves_parets,
+                desti=self.desti,
+                cami=self.cami + [(tipus, direccio)],
+                cost=self.cost + self.COSTS["POSAR_PARET"]
+            )
+
+            return nou, True
+
+        # 🔹 Si no entra en cap cas
+        return self, False
+
+        
 
     #Metode per comprovar si la posicio on ens volem moure es legal FALTA REVISAR MARGES 0 I 9
     def posLegal(self, posObjectiu):
@@ -83,31 +132,42 @@ class Estat:
             if p == posObjectiu:
                 valid = False
         return valid
-
     
-    #Metode per comprovar si la posicio on ens volem moure es legal FALTA REVISAR MARGES 0 I 9
-    def posLegal(self, posObjectiu):
-        valid = True
-        if posObjectiu[0] < 0 or posObjectiu[0] > 9 or posObjectiu[1] < 0 or posObjectiu[1] > 9:
-            valid = False
-        else:
-            for p in self.pos_parets:
-                if p == posObjectiu:
-                    valid = False
-        return valid
-
     #Metode genera fill
-    def genera_fill(self):
+    def genera_fill(self, mida):
+        fills = []
 
-        estats_generats= []
-        accions_possibles = self.accions_possibles()
-        for accions in accions_possibles:
-            fill, es_legal = self.transicio(accions)
-            if es_legal:
-                fill.cami.append(accions)
-                estats_generats.append(fill)
+        # Acció ESPERAR
+        nou, ok = self.transicio(("ESPERAR", None))
+        if ok:
+            fills.append(nou)
 
-        return estats_generats
+        for direccio in self.MOVIMENT:
+            dx, dy = self.MOVIMENT[direccio]
+            
+            
+            # MOURE
+            nx, ny = self.pos_agent[0] + dx, self.pos_agent[1] + dy
+            if 0 <= nx < mida[0] and 0 <= ny < mida[1]:
+                nou, ok = self.transicio(("MOURE", direccio))
+                if ok:
+                    fills.append(nou)
+
+            # BOTAR
+            nx, ny = self.pos_agent[0] + 2*dx, self.pos_agent[1] + 2*dy
+            if 0 <= nx < mida[0] and 0 <= ny < mida[1]:
+                nou, ok = self.transicio(("BOTAR", direccio))
+                if ok:
+                    fills.append(nou)
+
+            # POSAR_PARET
+            px, py = self.pos_agent[0] + dx, self.pos_agent[1] + dy
+            if 0 <= px < mida[0] and 0 <= py < mida[1]:
+                nou, ok = self.transicio(("POSAR_PARET", direccio))
+                if ok:
+                    fills.append(nou)
+
+        return fills
 
     #Metode per comprovar si som al desti
     def DestiFinal(self):
@@ -128,6 +188,5 @@ class Estat:
             self.cost = self.cost + 1
         elif self.accio == "BOTAR":
             self.cost = self.cost + 2
-        elif self.accio == "POSAR_PARET":
-            self.cost = self.cost + 3
-
+        else:
+            self.cost = self.cost +3
