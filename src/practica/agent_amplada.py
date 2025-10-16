@@ -3,11 +3,11 @@ from practica.agent import Viatger
 
 #Cerca no informada, BFS
 
-class agent_amplada(Viatger):
+class AgentAmplada(Viatger):
 
     #Metode constructor| frontera: Estats pendents a explorar, tancat: ja explorats, cami_exit: 
     def __init__(self):
-        super(agent_amplada, self).__init__()
+        super(AgentAmplada, self).__init__()
         self.__frontera = None
         self.__tancat = None
         self.__cami_exit = None
