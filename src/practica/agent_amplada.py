@@ -24,7 +24,8 @@ class agent_amplada(Viatger):
             estat_actual = self.__frontera.pop(0)
 
             if estat_actual in self.__tancat or estat_actual.HiHaParet():
-                continue 
+                continue
+            #Hola
 
             if estat_actual.DestiFinal():
                 break
