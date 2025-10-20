@@ -1,4 +1,4 @@
-from practica import agent_amplada as agent
+from practica import agent_A as agent
 from practica import joc
 
 
@@ -6,7 +6,7 @@ def main():
     mida = (10, 10)
 
     agents = [
-        agent.agent_amplada(),
+        agent.agent_A(),
     ]
 
     lab = joc.Laberint(agents, mida_taulell=mida)

@@ -4,7 +4,7 @@ class Estat:
 
     #Declaracio de map amb el moviment
     MOVIMENT = {"N": (0, -1), "S": (0, 1), "E": (1, 0), "O": (-1, 0)}
-    COSTS = {"MOURE": 1, "BOTAR": 2, "POSAR_PARET": 3}
+    COSTS = {"MOURE": 1, "BOTAR": 2, "POSAR_PARET": 3, "ESPERAR": 0}
     
     #Metode constructor
     def __init__(self, pos_agent, pos_parets, desti, cami=None, cost=0):
@@ -40,90 +40,88 @@ class Estat:
     def __eq__(self, other):
         return self.pos_agent == other.pos_agent and self.pos_parets == other.pos_parets
         
-    #Metode transicio 
-    """IMPLEMENTAR"""
+    
+#Metode transicio 
+    import copy
+
     def transicio(self, accio):
-
         """
+        Mètode corregit per utilitzar reassignació de frozenset (no té .add()).
         Acció: tuple (tipus, direccio)
-        tipus ∈ {"MOURE","BOTAR","POSAR_PARET","ESPERAR"}
-        direccio ∈ {"N","S","E","O"} o None
-
         Retorna (nou_estat, es_legal_bool)
         """
-        tipus, direccio = accio
+        tipus, direccio = accio 
         x, y = self.pos_agent
-
-        # Cas especial: esperar
+        
+        # 1. CAS ESPECIAL: ESPERAR
         if tipus == "ESPERAR":
-            nou = copy.deepcopy(self)
-            nou.cami.append(("ESPERAR", None))
-            # Pots deixar cost 0 si esperar no ha de costar res
-            nou.cost += 0
-            return nou, True
+            nou_estat = copy.deepcopy(self)
+            nou_estat.cami.append(("ESPERAR", None)) 
+            nou_estat.cost += self.COSTS.get("ESPERAR", 0)
+            return nou_estat, True
 
-        # Si no hi ha direcció vàlida
+        # Comprovació de direcció i càlcul del vector de moviment
         if direccio not in self.MOVIMENT:
             return self, False
+            
+        dx, dy = self.MOVIMENT[direccio] 
 
-        dx, dy = self.MOVIMENT[direccio]
-
-        # 🔹 1. MOURE
-        if tipus == "MOURE":
-            nx, ny = x + dx, y + dy
-            if (nx, ny) in self.pos_parets:
-                return self, False  # No pots moure't dins una paret
-
-            noves_parets = set(self.pos_parets)
-            noves_parets.add((x, y))  # Deixa paret darrere
-            nou = Estat(
-                pos_agent=(nx, ny),
-                pos_parets=noves_parets,
-                desti=self.desti,
-                cami=self.cami + [(tipus, direccio)],
-                cost=self.cost + self.COSTS["MOURE"]
-            )
-            return nou, True
-
-        # 🔹 2. BOTAR
-        if tipus == "BOTAR":
-            nx, ny = x + 2 * dx, y + 2 * dy
-            if (nx, ny) in self.pos_parets:
-                return self, False  # No pots caure dins una paret
-
-            noves_parets = set(self.pos_parets)
-            noves_parets.add((x, y))
-            nou = Estat(
-                pos_agent=(nx, ny),
-                pos_parets=noves_parets,
-                desti=self.desti,
-                cami=self.cami + [(tipus, direccio)],
-                cost=self.cost + self.COSTS["BOTAR"]
-            )
-            return nou, True
-
-        # 🔹 3. POSAR_PARET
-        if tipus == "POSAR_PARET":
-            px, py = x + dx, y + dy
-            if (px, py) in self.pos_parets or (px, py) == self.desti:
-                return self, False  # No pots posar paret al destí o damunt d'una paret
-
-            noves_parets = set(self.pos_parets)
-            noves_parets.add((px, py))
-            nou = Estat(
-                pos_agent=(x, y),
-                pos_parets=noves_parets,
-                desti=self.desti,
-                cami=self.cami + [(tipus, direccio)],
-                cost=self.cost + self.COSTS["POSAR_PARET"]
-            )
-
-            return nou, True
-
-        # 🔹 Si no entra en cap cas
-        return self, False
-
+        # 2. Càlcul de posObjectiu i Preparació
+        nou_estat = copy.deepcopy(self)
+        esLegal = True
+        posParet = None # Posició de la paret a afegir
         
+        if tipus == "BOTAR":
+            # Posició d'aterratge
+            posObjectiu = (x + 2 * dx, y + 2 * dy)
+            posParet = (x, y) # Paret es deixa a la posició actual
+            
+            if posObjectiu in self.pos_parets:
+                esLegal = False
+
+        elif tipus == "MOURE":
+            # Posició final
+            posObjectiu = (x + dx, y + dy)
+            posParet = (x, y) # Paret es deixa a la posició actual
+            
+            if posObjectiu in self.pos_parets:
+                esLegal = False
+
+        elif tipus == "POSAR_PARET":
+            # Posició on es col·loca la paret
+            posParet = (x + dx, y + dy)
+            
+            if posParet in self.pos_parets or posParet == self.desti:
+                esLegal = False
+                
+            posObjectiu = self.pos_agent # L'agent no es mou
+
+        else:
+            # Tipus d'acció desconeguda
+            return self, False
+
+        # 3. APLICACIÓ DELS CANVIS (Si és legal)
+        if esLegal:
+            if tipus in {"MOURE", "BOTAR"}:
+                nou_estat.pos_agent = posObjectiu
+                
+                # 🔴 CORRECCIÓ FROZENSET (Unió i reassignació)
+                nou_estat.pos_parets = nou_estat.pos_parets | {posParet}
+                
+            elif tipus == "POSAR_PARET":
+                # 🔴 CORRECCIÓ FROZENSET (Unió i reassignació)
+                nou_estat.pos_parets = nou_estat.pos_parets | {posParet}
+                
+            # Actualització final (cost i camí)
+            nou_estat.cost += self.COSTS[tipus] 
+            nou_estat.cami.append((tipus, direccio)) 
+            
+            return nou_estat, True
+        
+        # 4. Retorn en cas d'il·legalitat
+        else:
+            return self, False
+                    
 
     #Metode per comprovar si la posicio on ens volem moure es legal FALTA REVISAR MARGES 0 I 9
     def posLegal(self, posObjectiu):
@@ -132,6 +130,7 @@ class Estat:
             if p == posObjectiu:
                 valid = False
         return valid
+        
     
     #Metode genera fill
     def genera_fill(self, mida):
@@ -165,6 +164,7 @@ class Estat:
             if 0 <= px < mida[0] and 0 <= py < mida[1]:
                 nou, ok = self.transicio(("POSAR_PARET", direccio))
                 if ok:
+                    
                     fills.append(nou)
 
         return fills
@@ -190,3 +190,5 @@ class Estat:
             self.cost = self.cost + 2
         else:
             self.cost = self.cost +3
+            
+    

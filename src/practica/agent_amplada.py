@@ -48,8 +48,6 @@ class agent_amplada(Viatger):
                 pos_agent=percepcio["AGENTS"][self.nom],
                 pos_parets=percepcio["PARETS"],
                 desti=percepcio["DESTI"],
-
-
             )
 
             self.cerca(estat_inicial, percepcio)
