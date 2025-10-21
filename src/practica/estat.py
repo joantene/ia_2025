@@ -194,3 +194,5 @@ class Estat:
         # f(n) = g(n) + h(n) (fórmula de A*)
         return self.cost + heuristica
     
+    def es_victoria(self):
+        return self.pos_agent == self.desti

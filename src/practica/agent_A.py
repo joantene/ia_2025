@@ -16,14 +16,16 @@ class Agent_A(Viatger):
         #Inicialitzacio de variables a 0
         self.__frontera = PriorityQueue()
         self.__tancat = set()
+        contador = 0  # Contador para desempate
                 
 
-        self.__frontera.put((estat_inicial.CalculaCost(), estat_inicial))
+        self.__frontera.put((estat_inicial.CalculaCost(), contador, estat_inicial))
+        contador += 1
         actual = None
         #Mentres quedin estats a frontera
         while not self.__frontera.empty():
             #Agafa l'estat actual del proxim element de frontera
-            _, actual = self.__frontera.get()
+            _, _, actual = self.__frontera.get()
 
             #Si ja hem explorat l'estat o hi ha una paret passa a una altre iteracio
             if actual in self.__tancat :
@@ -36,7 +38,8 @@ class Agent_A(Viatger):
             estat_fills = actual.genera_fill(percepcio["MIDA"])
             #Te comprova tots els estats disponibles en aquell moment y actualitza frontera (estats a explorar)
             for f in estat_fills:
-                self.__frontera.put((f.CalculaCost(), f))
+                self.__frontera.put((f.CalculaCost(), contador, f))
+                contador += 1
                 
 
             #Afegeix al tancat(ja explorats l'estat actual)
