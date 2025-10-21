@@ -43,10 +43,9 @@ class Estat:
     #Metode eq
     def __eq__(self, other):
         return self.pos_agent == other.pos_agent and self.pos_parets == other.pos_parets
-        
+  
     
 #Metode transicio 
-    import copy
 
     def transicio(self, accio):
         """
@@ -188,11 +187,10 @@ class Estat:
 
     #funcio per calcular el cost de l'euristica
     def CalculaCost(self):
-        if self.accio == "MOURE":
-            self.cost = self.cost + 1
-        elif self.accio == "BOTAR":
-            self.cost = self.cost + 2
-        else:
-            self.cost = self.cost +3
-            
+        # g(n) = coste acumulado real (ya calculado en self.cost)
+        # h(n) = heurística (distancia Manhattan al destino)
+        heuristica = abs(self.pos_agent[0] - self.desti[0]) + abs(self.pos_agent[1] - self.desti[1])
+        
+        # f(n) = g(n) + h(n) (fórmula de A*)
+        return self.cost + heuristica
     
