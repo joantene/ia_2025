@@ -6,7 +6,7 @@ def main():
     mida = (10, 10)
 
     agents = [
-        agent.agent_A(),
+        agent.Agent_A(),
     ]
 
     lab = joc.Laberint(agents, mida_taulell=mida)

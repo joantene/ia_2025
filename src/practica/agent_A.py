@@ -2,7 +2,7 @@ from practica.agent import Viatger
 from practica.estat import Estat
 
 #Metode constructor| frontera: Estats pendents a explorar, tancat: ja explorats, cami_exit: 
-class agent_A(Viatger):
+class Agent_A(Viatger):
     def __init__(self):
         super().__init__()
         self.__frontera = None

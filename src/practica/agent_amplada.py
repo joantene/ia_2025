@@ -3,7 +3,7 @@ from practica.agent import Viatger
 
 #Cerca no informada, BFS
 
-class agent_amplada(Viatger):
+class Agent_amplada(Viatger):
     def __init__(self):
         
             super().__init__()

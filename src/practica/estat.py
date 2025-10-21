@@ -1,5 +1,9 @@
 import copy
-
+"""CHAT
+-Init
+-Genera Fills
+-Transicio
+    """
 class Estat:
 
     #Declaracio de map amb el moviment
