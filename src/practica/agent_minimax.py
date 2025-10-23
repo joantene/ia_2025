@@ -8,7 +8,7 @@ class AgentMinimax(Viatger):
         self.__cami_exit = None
         self.__poda = poda
 
-    def cerca(self, estat: Estat, percepcio, alpha, beta, torn_max=True, profunditat=0, max_profunditat=10):
+    def cerca(self, estat: Estat, percepcio, alpha, beta, torn_max=True, profunditat=0, max_profunditat=4):
         # Condició de parada: estat meta o profunditat màxima
         if estat.DestiFinal() or profunditat >= max_profunditat:
             # Heurística: distància Manhattan negativa (millor si està més a prop)
@@ -57,16 +57,17 @@ class AgentMinimax(Viatger):
         if isinstance(res, tuple) and res[0].cami is not None and len(res[0].cami) > 0:
             solucio, _ = res
             # Retornar la primera acció del camí
-            accio = solucio.cami[0]
-            tipus, direccio = accio
+            direccio = solucio.cami[0]
             
-            if tipus == "ESPERAR":
-                return "ESPERAR"
-            elif tipus == "MOURE":
-                return direccio
-            elif tipus == "BOTAR":
-                return direccio  # o retornar un format específic per BOTAR si cal
-            elif tipus == "POSAR_PARET":
-                return f"PARET_{direccio}"  # adapta segons el format que espera el joc
-        
-        return "ESPERAR"
+            if direccio[0] == "ESPERAR":
+                return "ESPERAR", None
+            if direccio[0] == "MOURE":
+                return "MOURE", direccio[1]  
+            if direccio[0] == "BOTAR":
+                return "BOTAR", direccio[1]    
+            if direccio[0] == "POSAR_PARET":
+
+                return "POSAR_PARET", direccio[1]
+                
+            else:
+                return "ESPERAR", None

@@ -3,6 +3,7 @@ import copy
 -Init
 -Genera Fills
 -Transicio
+-Calcula cost
     """
 class Estat:
 
@@ -23,16 +24,16 @@ class Estat:
     def accions_possibles(self):
 
         accions_possibles = []
-        accions_possibles.append((0, "ESPERAR"))
+        accions_possibles.append(("ESPERAR", None))
         #MOURE
-        for direccio in Estat.moviment:
-            accions_possibles.append((direccio, "MOURE"))
+        for direccio in Estat.MOVIMENT:
+            accions_possibles.append(("MOURE", direccio))
         #BOTAR
-        for direccio in Estat.moviment:
-            accions_possibles.append((direccio, "BOTAR"))
+        for direccio in Estat.MOVIMENT:
+            accions_possibles.append(("BOTAR", direccio))
         #POSAR PARET
-        for direccio in Estat.moviment:
-            accions_possibles.append((direccio, "POSAR_PARET"))
+        for direccio in Estat.MOVIMENT:
+            accions_possibles.append(("POSAR_PARET", direccio))
 
         return accions_possibles
 
