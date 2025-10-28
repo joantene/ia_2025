@@ -23,6 +23,7 @@ class Agent_A(Viatger):
         contador += 1
         actual = None
         #Mentres quedin estats a frontera
+        #Treu estat de la priorityQueue regit pel valor del cost
         while not self.__frontera.empty():
             #Agafa l'estat actual del proxim element de frontera
             _, _, actual = self.__frontera.get()
@@ -53,7 +54,7 @@ class Agent_A(Viatger):
     
 
     def actua(self, percepcio: dict):
-
+            #Inicialitza estat inicial en el cas que aquest sigui null
             if self.__cami_exit is None:
                 estat_inicial = Estat(
                     pos_agent=percepcio["AGENTS"][self.nom],
@@ -61,24 +62,21 @@ class Agent_A(Viatger):
                     desti=percepcio["DESTI"],
                     mida_taulell=percepcio["MIDA"]
                 )
-
+                #Crida el metode cerca passant-li l'estat inicial
                 self.cerca(estat_inicial, percepcio)
 
-
+            #Si la variable cami_exit no es none (Hem arribat al cami final)
             if self.__cami_exit:
-                
+                #Extreu les passes i actua
                 direccio = self.__cami_exit.pop(0)
 
                 if direccio[0] == "ESPERAR":
                     return "ESPERAR", None
                 if direccio[0] == "MOURE":
-                    return "MOURE", direccio[1]
-                    
+                    return "MOURE", direccio[1] 
                 if direccio[0] == "BOTAR":
                     return "BOTAR", direccio[1]    
                 if direccio[0] == "POSAR_PARET":
-
                     return "POSAR_PARET", direccio[1]
-                
             else:
                 return "ESPERAR", None

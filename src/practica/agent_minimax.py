@@ -3,11 +3,12 @@ from practica.estat import Estat
 
 
 class AgentMinimax(Viatger):
+    #Metode constructor
     def __init__(self, poda=False):
         super().__init__()
-        self.__cami_exit = None
         self.__poda = poda
 
+    #Metode Cerca
     def cerca(self, estat: Estat, percepcio, alpha, beta, torn_max=True, profunditat=0, max_profunditat=4):
         # Condició de parada: estat meta o profunditat màxima
         if estat.es_meta() or profunditat >= max_profunditat:
@@ -42,22 +43,25 @@ class AgentMinimax(Viatger):
         else:
             return puntuacio_fills[0]
 
+    #Metode pinta
     def pinta(self, display):
         pass
 
+    #Metode actua
     def actua(self, percepcio):
+        #Inicialitza estat inicial en el cas que aquest sigui null
         estat_inicial = Estat(
             pos_agent=percepcio["AGENTS"][self.nom],
             pos_parets=percepcio["PARETS"],
             desti=percepcio["DESTI"],
             mida_taulell=percepcio["MIDA"]
         )
-        
+        #Crida el metode cerca
         res = self.cerca(estat_inicial, percepcio, alpha=-float('inf'), beta=float('inf'))
 
         if isinstance(res, tuple) and res[0].cami is not None and len(res[0].cami) > 0:
             solucio, _ = res
-            # Retornar la primera acció del camí
+            #Extreu les passes i actua
             direccio = solucio.cami[0]
             
             if direccio[0] == "ESPERAR":

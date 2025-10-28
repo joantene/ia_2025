@@ -60,17 +60,15 @@ class Agent_amplada(Viatger):
 
         #Si la variable cami_exit no es none (Hem arribat al cami final)
         if self.__cami_exit:
-            #Extrue les passes i actua
+            #Extreu les passes i actua
             direccio = self.__cami_exit.pop(0)
             if direccio[0] == "ESPERAR":
                 return "ESPERAR", None
             if direccio[0] == "MOURE":
                 return "MOURE", direccio[1]
-                
             if direccio[0] == "BOTAR":
                 return "BOTAR", direccio[1]    
             if direccio[0] == "POSAR_PARET":
                 return "POSAR_PARET", direccio[1]
-            
         else:
             return "ESPERAR", None
