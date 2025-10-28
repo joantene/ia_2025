@@ -32,10 +32,10 @@ class Agent_A(Viatger):
                 continue
           
             #Si hem arribat al desti final surt del bucle
-            if actual.DestiFinal():
+            if actual.es_meta():
                 break
             
-            estat_fills = actual.genera_fill(percepcio["MIDA"])
+            estat_fills = actual.genera_fill()
             #Te comprova tots els estats disponibles en aquell moment y actualitza frontera (estats a explorar)
             for f in estat_fills:
                 self.__frontera.put((f.CalculaCost(), contador, f))
@@ -46,7 +46,7 @@ class Agent_A(Viatger):
             self.__tancat.add(actual)
 
         #Si l'estat actual es igual al desti que volem arribat guarda el cami y actualitza a true la variable exit
-        if actual.DestiFinal():
+        if actual.es_meta():
             self.__cami_exit = actual.cami
             exit = True
         return exit

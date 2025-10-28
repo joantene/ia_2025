@@ -10,7 +10,7 @@ class AgentMinimax(Viatger):
 
     def cerca(self, estat: Estat, percepcio, alpha, beta, torn_max=True, profunditat=0, max_profunditat=4):
         # Condició de parada: estat meta o profunditat màxima
-        if estat.DestiFinal() or profunditat >= max_profunditat:
+        if estat.es_meta() or profunditat >= max_profunditat:
             # Heurística: distància Manhattan negativa (millor si està més a prop)
             distancia = abs(estat.pos_agent[0] - estat.desti[0]) + abs(estat.pos_agent[1] - estat.desti[1])
             puntuacio = -distancia - estat.cost  # penalitzar cost i distància
@@ -18,7 +18,7 @@ class AgentMinimax(Viatger):
 
         puntuacio_fills = []
 
-        for fill in estat.genera_fill(percepcio["MIDA"]):
+        for fill in estat.genera_fill():
             punt_fill = self.cerca(fill, percepcio, alpha, beta, not torn_max, profunditat + 1, max_profunditat)
 
             if torn_max:

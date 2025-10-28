@@ -29,18 +29,18 @@ class Agent_amplada(Viatger):
                 continue
 
             #Si hem arribat al desti final surt del bucle
-            if estat_actual.DestiFinal():
+            if estat_actual.es_meta():
                 break
 
             #Te comprova tots els estats disponibles en aquell moment y actualitza frontera (estats a explorar)
-            for f in estat_actual.genera_fill(percepcio["MIDA"]):
+            for f in estat_actual.genera_fill():
                 self.__frontera.append(f)
 
             #Afegeix al tancat(ja explorats l'estat actual)
             self.__tancat.add(estat_actual)
 
         #Si l'estat actual es igual al desti que volem arribat guarda el cami y actualitza a true la variable exit
-        if estat_actual.DestiFinal():
+        if estat_actual.es_meta():
             self.__cami_exit = estat_actual.cami
             exit = True
         return exit

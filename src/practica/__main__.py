@@ -3,7 +3,7 @@ from practica import joc
 
 
 def main():
-    mida = (5, 5)
+    mida = (10, 10)
 
     agents = [
         agent.AgentMinimax(), agent.AgentMinimax()
