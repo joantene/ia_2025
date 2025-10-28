@@ -7,13 +7,14 @@ class Estat:
     MOVIMENT = {"MOURE": 1, "BOTAR": 2, "POSAR_PARET": 3, "ESPERAR": 0}
     
     #Metode constructor
-    def __init__(self, pos_agent, pos_parets, desti, cami=None, cost=0):
+    def __init__(self, pos_agent, pos_parets, mida_taulell, desti, cami=None, cost=0):
         self.pos_agent = tuple(pos_agent)
         # fem frozenset per fer hashable; si ja és frozenset no passa res
         self.pos_parets = frozenset(pos_parets)
         self.desti = tuple(desti)
         self.cami = [] if cami is None else list(cami)
         self.cost = cost
+        self.mida_taulell = mida_taulell
         
 
     #Metode hash
@@ -74,16 +75,28 @@ class Estat:
             return self, False
             
                     
-
-    #Metode per comprovar si la posicio on ens volem moure es legal FALTA REVISAR MARGES 0 I 9
+    #Metode per comprovar si la posicio on ens volem moure es legal
     def posLegal(self, posObjectiu):
         valid = True
+        #Comprova que no hagi una paret
         for p in self.pos_parets:
             if p == posObjectiu:
                 valid = False
-        return valid
         
+        #Comprovar que no seguem defora del taulell
+        #(negatiu)
+        if posObjectiu[0] < 0 or posObjectiu[1] < 0:
+            valid=False
+        
+        # mes gran que "mida_taulell"
+        limits = self.mida_taulell[1]
+        if posObjectiu[0] >= limits or posObjectiu[1] >= limits:
+            valid=False
+
+        return valid
     
+        
+
     #Metode genera fill
     def genera_fill(self):
         fills = []

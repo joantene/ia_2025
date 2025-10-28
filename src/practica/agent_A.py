@@ -59,6 +59,7 @@ class Agent_A(Viatger):
                     pos_agent=percepcio["AGENTS"][self.nom],
                     pos_parets=percepcio["PARETS"],
                     desti=percepcio["DESTI"],
+                    mida_taulell=percepcio["MIDA"]
                 )
 
                 self.cerca(estat_inicial, percepcio)

@@ -49,7 +49,8 @@ class AgentMinimax(Viatger):
         estat_inicial = Estat(
             pos_agent=percepcio["AGENTS"][self.nom],
             pos_parets=percepcio["PARETS"],
-            desti=percepcio["DESTI"]
+            desti=percepcio["DESTI"],
+            mida_taulell=percepcio["MIDA"]
         )
         
         res = self.cerca(estat_inicial, percepcio, alpha=-float('inf'), beta=float('inf'))

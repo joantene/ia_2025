@@ -52,6 +52,7 @@ class Agent_amplada(Viatger):
                 pos_agent=percepcio["AGENTS"][self.nom],
                 pos_parets=percepcio["PARETS"],
                 desti=percepcio["DESTI"],
+                mida_taulell=percepcio["MIDA"]
             )
 
             #Crida el metode cerca passant-li l'estat inicial
