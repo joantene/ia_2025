@@ -27,7 +27,6 @@ def quiques():
     """ Executa la tasca quiques"""
     run_module("quiques")
 
-
 @app.command()
 def monedes():
     """ Executa la tasca monedes"""
@@ -42,6 +41,16 @@ def practica():
 def tictac():
     """ Executa la tasca tic-tac-toe"""
     run_module("tictac")
+
+@app.command()
+def gridworld():
+    """ Executa la tasca gridworld"""
+    run_module("gridworld")
+
+@app.command()
+def cliffwalking():
+    """ Executa la tasca cliffwalking"""
+    run_module("cliffwalking")
 
 @app.command()
 def prova():
