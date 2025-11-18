@@ -75,7 +75,6 @@ class AgentMinimax(Viatger):
                 return "POSAR_PARET", direccio[1]
                 
             else:
-                
                 return "ESPERAR", None
             
         else:
