@@ -1,6 +1,7 @@
 import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 
 # -------------------------------
@@ -248,15 +249,41 @@ def genetic_algorithm_frozenlake(render_best=False):
     print(global_best_individual)
 
     # Dibuixem la corba d'aprenentatge (millor i mitjana)
-    plt.plot(best_fitness_history, label="Millor fitness")
-    plt.plot(avg_fitness_history, label="Fitness mitjà")
-    plt.xlabel("Generació")
-    plt.ylabel("Fitness")
-    plt.legend()
-    plt.title("Algoritme genètic a FrozenLake")
-    plt.tight_layout()
-    plt.savefig("ga_frozenlake_fitness.png")
-    plt.close()
+    if best_fitness_history and avg_fitness_history:
+        x = np.arange(len(best_fitness_history), dtype=int)
+
+        plt.figure(figsize=(8, 4.5), dpi=120)
+        plt.plot(x, best_fitness_history, label="Millor fitness", color="tab:blue", linewidth=1.5)
+        plt.plot(x, avg_fitness_history, label="Fitness mitjà", color="tab:orange", linewidth=1.0, alpha=0.9)
+
+        plt.xlabel("Generació")
+        plt.ylabel("Fitness")
+        plt.title("Algoritme genètic a FrozenLake")
+        plt.grid(alpha=0.3)
+        plt.legend()
+
+        # Forçar ticks enters i evitar massa marques si len gran
+        ax = plt.gca()
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        # Si hi ha moltes generacions, mostrem només cada k generacions
+        n = len(x)
+        if n > 20:
+            step = max(1, n // 10)
+            ax.set_xticks(np.arange(0, n, step))
+
+        # Marca i anota la millor generació
+        best_gen = int(np.argmax(best_fitness_history))
+        best_val = best_fitness_history[best_gen]
+        plt.scatter([best_gen], [best_val], color="red", zorder=5)
+        plt.annotate(f"Gen {best_gen}\\n{best_val:.1f}", (best_gen, best_val),
+                     textcoords="offset points", xytext=(6,6), fontsize=9)
+
+        plt.tight_layout()
+        plt.savefig("ga_frozenlake_fitness.png")
+        plt.savefig("ga_frozenlake_fitness.svg")
+        plt.close()
+    else:
+        print("No hi ha dades de fitness per dibuixar la corba.")
 
     # Opcional: executar un episodi amb el millor cromosoma i renderitzar-lo
     if render_best:
