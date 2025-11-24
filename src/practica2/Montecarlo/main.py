@@ -13,7 +13,7 @@ def run(episodes, is_training=True, render=False):
         q = np.zeros((env.observation_space.n, env.action_space.n))
 
         # Returns(s, a) <- empty list, for all s ∈ S, a ∈ A(s)
-        returns = {}
+        retorn = {}
         
     else:
         f = open("frozen_lake4x4.pk1", "rb")
@@ -69,14 +69,14 @@ def run(episodes, is_training=True, render=False):
                 if (s, a) not in visited_sa:
                     visited_sa.add((s, a)) 
 
-                    if (s, a) not in returns:
-                        returns[(s, a)] = []
+                    if (s, a) not in retorn:
+                        retorn[(s, a)] = []
                     
                     # Append G to Returns(S_t, A_t)
-                    returns[(s, a)].append(G)
+                    retorn[(s, a)].append(G)
                     
                     # Q(S_t, a) <- average(Returns(S_t, a))
-                    q[s, a] = np.mean(returns[(s, a)])
+                    q[s, a] = np.mean(retorn[(s, a)])
 
             # π(S_t) <- argmax_a Q(S_t, a) 
             epsilon = max(epsilon - decay_rate, 0)
